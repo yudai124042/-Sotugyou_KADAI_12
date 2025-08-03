@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hikyaku - 手ぶら観光サービス</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --secondary-orange: #FF8C42;
+            --accent-orange: #FFA500;
+            --light-orange: #FFB366;
+            --gradient-orange: linear-gradient(135deg, #FF6B35 0%, #FF8C42 50%, #FFA500 100%);
+            --gradient-light: linear-gradient(135deg, #FFF5F0 0%, #FFFFFF 100%);
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            background: var(--gradient-light);
+        }
+
+        .gradient-bg {
+            background: var(--gradient-orange);
+        }
+
+        .gradient-text {
+            background: var(--gradient-orange);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .orange-shadow {
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+        }
+
+        .orange-shadow-sm {
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+        }
+
+        .btn-primary {
+            background: var(--gradient-orange);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 107, 53, 0.15);
+        }
+
+        .step-number {
+            background: var(--gradient-orange);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .form-input {
+            border: 2px solid #FFE4D6;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--primary-orange);
+        }
+
+        .map-placeholder {
+            background: linear-gradient(135deg, #FFE4D6 0%, #FFFFFF 100%);
+            border: 2px dashed var(--light-orange);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="gradient-bg w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shipping-fast text-white text-xl"></i>
+                    </div>
+                    <span class="ml-3 text-2xl font-bold gradient-text">Hikyaku</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-item text-gray-700 hover:text-orange-500 font-medium" data-translate="nav.home">ホーム</a>
+                    <a href="#service" class="nav-item text-gray-700 hover:text-orange-500 font-medium" data-translate="nav.service">サービス</a>
+                    <a href="#reserve" class="nav-item text-gray-700 hover:text-orange-500 font-medium" data-translate="nav.reserve">予約</a>
+                    <div class="flex items-center space-x-2">
+                        <button id="langToggle" class="px-3 py-1 rounded-full border-2 border-orange-200 text-orange-600 hover:bg-orange-50 transition">
+                            <i class="fas fa-globe mr-1"></i>
+                            <span id="currentLang">JP</span>
+                        </button>
+                        <button id="loginBtn" class="btn-primary text-white px-6 py-2 rounded-full font-medium" data-translate="nav.login">
+                            <i class="fas fa-user mr-2"></i>ログイン
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#home" class="block px-3 py-2 text-gray-700" data-translate="nav.home">ホーム</a>
+                <a href="#service" class="block px-3 py-2 text-gray-700" data-translate="nav.service">サービス</a>
+                <a href="#reserve" class="block px-3 py-2 text-gray-700" data-translate="nav.reserve">予約</a>
+                <button id="mobileLoginBtn" class="w-full text-left px-3 py-2 text-orange-600 font-medium" data-translate="nav.login">ログイン</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="text-center">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                        <span class="gradient-text" data-translate="hero.title">手ぶらで</span><br>
+                        <span class="text-gray-800" data-translate="hero.subtitle">観光を楽しもう</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto" data-translate="hero.description">
+                        荷物を預けて、身軽に観光地を巡ろう。可動式ロッカーで、どこでも荷物をお預かりします。
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button id="reserveBtn" class="btn-primary text-white px-8 py-4 rounded-full text-lg font-medium">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span data-translate="hero.reserve">今すぐ予約</span>
+                        </button>
+                        <button class="bg-white text-orange-600 px-8 py-4 rounded-full text-lg font-medium border-2 border-orange-200 hover:bg-orange-50 transition">
+                            <i class="fas fa-play-circle mr-2"></i>
+                            <span data-translate="hero.how">使い方を見る</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Steps -->
+        <section id="service" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-6" data-translate="steps.title">
+                        3ステップで手ぶら観光
+                    </h2>
+                    <p class="text-xl text-gray-600" data-translate="steps.subtitle">
+                        簡単・安全・便利な荷物預かりサービス
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card-hover bg-gradient-to-br from-orange-50 to-white p-8 rounded-2xl orange-shadow-sm text-center">
+                        <div class="step-number mx-auto mb-6">1</div>
+                        <div class="text-4xl mb-4"><i class="fas fa-map-marker-alt" style="color: var(--primary-orange);"></i></div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4" data-translate="step1.title">場所を選択</h3>
+                        <p class="text-gray-600" data-translate="step1.description">
+                            観光したいエリアで荷物の預け先と受け取り先を選択します
+                        </p>
+                    </div>
+
+                    <div class="card-hover bg-gradient-to-br from-orange-50 to-white p-8 rounded-2xl orange-shadow-sm text-center">
+                        <div class="step-number mx-auto mb-6">2</div>
+                        <div class="text-4xl mb-4"><i class="fas fa-clock" style="color: var(--secondary-orange);"></i></div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4" data-translate="step2.title">時間を指定</h3>
+                        <p class="text-gray-600" data-translate="step2.description">
+                            荷物を預ける時間と受け取る時間を指定します
+                        </p>
+                    </div>
+
+                    <div class="card-hover bg-gradient-to-br from-orange-50 to-white p-8 rounded-2xl orange-shadow-sm text-center">
+                        <div class="step-number mx-auto mb-6">3</div>
+                        <div class="text-4xl mb-4"><i class="fas fa-luggage-cart" style="color: var(--accent-orange);"></i></div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4" data-translate="step3.title">手ぶらで観光</h3>
+                        <p class="text-gray-600" data-translate="step3.description">
+                            荷物を預けて、身軽に観光を楽しみましょう
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reservation Form -->
+        <section id="reserve" class="py-20 bg-gradient-to-br from-orange-50 to-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-6" data-translate="reserve.title">
+                        荷物預かり予約
+                    </h2>
+                    <p class="text-xl text-gray-600" data-translate="reserve.subtitle">
+                        必要な情報を入力して予約を完了しましょう
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl orange-shadow p-8">
+                    <form id="reservationForm">
+                        <!-- User Info (when not logged in) -->
+                        <div id="guestInfo" class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.user_info">
+                                <i class="fas fa-user mr-3" style="color: var(--primary-orange);"></i>利用者情報
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.name">お名前 *</label>
+                                    <input type="text" id="userName" class="form-input w-full px-4 py-3 rounded-xl" placeholder="山田太郎" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.email">メールアドレス *</label>
+                                    <input type="email" id="userEmail" class="form-input w-full px-4 py-3 rounded-xl" placeholder="example@email.com" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.phone">電話番号</label>
+                                    <input type="tel" id="userPhone" class="form-input w-full px-4 py-3 rounded-xl" placeholder="090-1234-5678">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pickup Location -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.pickup_location">
+                                <i class="fas fa-map-marker-alt mr-3" style="color: var(--primary-orange);"></i>荷物預け先
+                            </h3>
+                            <div class="map-placeholder h-64 rounded-xl flex items-center justify-center mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-map text-4xl mb-4" style="color: var(--light-orange);"></i>
+                                    <p class="text-gray-600" data-translate="form.select_map">地図をクリックして場所を選択してください</p>
+                                    <button type="button" id="selectPickupBtn" class="mt-4 bg-orange-100 text-orange-600 px-6 py-2 rounded-full hover:bg-orange-200 transition">
+                                        <i class="fas fa-search-location mr-2"></i>
+                                        <span data-translate="form.select_location">場所を選択</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="text" id="pickupLocation" class="form-input w-full px-4 py-3 rounded-xl" placeholder="新宿駅東口" data-translate-placeholder="form.pickup_placeholder">
+                        </div>
+
+                        <!-- Return Location -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.return_location">
+                                <i class="fas fa-map-marker-alt mr-3" style="color: var(--secondary-orange);"></i>荷物受け取り先
+                            </h3>
+                            <div class="map-placeholder h-64 rounded-xl flex items-center justify-center mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-map text-4xl mb-4" style="color: var(--light-orange);"></i>
+                                    <p class="text-gray-600" data-translate="form.select_map">地図をクリックして場所を選択してください</p>
+                                    <button type="button" id="selectReturnBtn" class="mt-4 bg-orange-100 text-orange-600 px-6 py-2 rounded-full hover:bg-orange-200 transition">
+                                        <i class="fas fa-search-location mr-2"></i>
+                                        <span data-translate="form.select_location">場所を選択</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="text" id="returnLocation" class="form-input w-full px-4 py-3 rounded-xl" placeholder="浅草寺" data-translate-placeholder="form.return_placeholder">
+                        </div>
+
+                        <!-- Date and Time -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.datetime">
+                                <i class="fas fa-clock mr-3" style="color: var(--accent-orange);"></i>日時指定
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.pickup_time">預け時間 *</label>
+                                    <input type="datetime-local" id="pickupTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.return_time">受け取り時間 *</label>
+                                    <input type="datetime-local" id="returnTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="immediatePickup" class="mr-3 w-5 h-5 text-orange-600">
+                                    <span class="text-gray-700" data-translate="form.immediate">今すぐ預ける（即時対応）</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Luggage Info -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.luggage_info">
+                                <i class="fas fa-suitcase mr-3" style="color: var(--primary-orange);"></i>荷物情報
+                            </h3>
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.small_size">Sサイズ（~40cm）</label>
+                                    <select id="smallBags" class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="0">0個</option>
+                                        <option value="1">1個</option>
+                                        <option value="2">2個</option>
+                                        <option value="3">3個</option>
+                                        <option value="4">4個</option>
+                                        <option value="5">5個+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.medium_size">Mサイズ（~60cm）</label>
+                                    <select id="mediumBags" class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="0">0個</option>
+                                        <option value="1">1個</option>
+                                        <option value="2">2個</option>
+                                        <option value="3">3個</option>
+                                        <option value="4">4個</option>
+                                        <option value="5">5個+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2" data-translate="form.large_size">Lサイズ（60cm+）</label>
+                                    <select id="largeBags" class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="0">0個</option>
+                                        <option value="1">1個</option>
+                                        <option value="2">2個</option>
+                                        <option value="3">3個</option>
+                                        <option value="4">4個</option>
+                                        <option value="5">5個+</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Requests -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6" data-translate="form.special_requests">
+                                <i class="fas fa-comment mr-3" style="color: var(--secondary-orange);"></i>特別なご要望
+                            </h3>
+                            <textarea id="specialRequests" class="form-input w-full px-4 py-3 rounded-xl h-32" placeholder="冷蔵が必要、壊れやすい物品など" data-translate-placeholder="form.requests_placeholder"></textarea>
+                        </div>
+
+                        <!-- Price Estimate -->
+                        <div class="mb-8 bg-orange-50 p-6 rounded-xl">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4" data-translate="form.price_estimate">
+                                <i class="fas fa-calculator mr-3" style="color: var(--accent-orange);"></i>料金見積もり
+                            </h3>
+                            <div class="text-3xl font-bold gradient-text">
+                                ¥<span id="priceEstimate">0</span>
+                            </div>
+                            <p class="text-gray-600 mt-2" data-translate="form.price_note">
+                                ※実際の料金は荷物サイズと距離により決定されます
+                            </p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn-primary text-white px-12 py-4 rounded-full text-xl font-medium">
+                                <i class="fas fa-calendar-check mr-3"></i>
+                                <span data-translate="form.submit">予約を確定する</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full orange-shadow">
+            <div class="text-center mb-6">
+                <div class="gradient-bg w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold gradient-text" data-translate="login.title">ログイン</h2>
+                <p class="text-gray-600 mt-2" data-translate="login.subtitle">アカウントにログインしてください</p>
+            </div>
+
+            <div class="space-y-4">
+                <button id="googleLoginBtn" class="w-full bg-red-500 text-white py-3 rounded-xl font-medium hover:bg-red-600 transition">
+                    <i class="fab fa-google mr-2"></i>
+                    <span data-translate="login.google">Googleでログイン</span>
+                </button>
+                
+                <div class="text-center text-gray-500" data-translate="login.or">または</div>
+                
+                <form id="emailLoginForm">
+                    <div class="space-y-4">
+                        <input type="email" id="loginEmail" class="form-input w-full px-4 py-3 rounded-xl" placeholder="メールアドレス" data-translate-placeholder="login.email" required>
+                        <input type="password" id="loginPassword" class="form-input w-full px-4 py-3 rounded-xl" placeholder="パスワード" data-translate-placeholder="login.password" required>
+                        <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl font-medium">
+                            <span data-translate="login.signin">サインイン</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center mt-6">
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700" data-translate="login.close">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full orange-shadow">
+            <div class="text-center">
+                <div class="gradient-bg w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold gradient-text mb-4" data-translate="success.title">予約完了！</h2>
+                <p class="text-gray-600 mb-6" data-translate="success.message">
+                    予約が正常に完了しました。詳細情報をメールでお送りします。
+                </p>
+                <button id="closeSuccessModal" class="btn-primary text-white px-8 py-3 rounded-full font-medium">
+                    <span data-translate="success.close">閉じる</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Translation data
+        const translations = {
+            ja: {
+                'nav.home': 'ホーム',
+                'nav.service': 'サービス',
+                'nav.reserve': '予約',
+                'nav.login': 'ログイン',
+                'hero.title': '手ぶらで',
+                'hero.subtitle': '観光を楽しもう',
+                'hero.description': '荷物を預けて、身軽に観光地を巡ろう。可動式ロッカーで、どこでも荷物をお預かりします。',
+                'hero.reserve': '今すぐ予約',
+                'hero.how': '使い方を見る',
+                'steps.title': '3ステップで手ぶら観光',
+                'steps.subtitle': '簡単・安全・便利な荷物預かりサービス',
+                'step1.title': '場所を選択',
+                'step1.description': '観光したいエリアで荷物の預け先と受け取り先を選択します',
+                'step2.title': '時間を指定',
+                'step2.description': '荷物を預ける時間と受け取る時間を指定します',
+                'step3.title': '手ぶらで観光',
+                'step3.description': '荷物を預けて、身軽に観光を楽しみましょう',
+                'reserve.title': '荷物預かり予約',
+                'reserve.subtitle': '必要な情報を入力して予約を完了しましょう',
+                'form.user_info': '利用者情報',
+                'form.name': 'お名前 *',
+                'form.email': 'メールアドレス *',
+                'form.phone': '電話番号',
+                'form.pickup_location': '荷物預け先',
+                'form.return_location': '荷物受け取り先',
+                'form.select_map': '地図をクリックして場所を選択してください',
+                'form.select_location': '場所を選択',
+                'form.pickup_placeholder': '新宿駅東口',
+                'form.return_placeholder': '浅草寺',
+                'form.datetime': '日時指定',
+                'form.pickup_time': '預け時間 *',
+                'form.return_time': '受け取り時間 *',
+                'form.immediate': '今すぐ預ける（即時対応）',
+                'form.luggage_info': '荷物情報',
+                'form.small_size': 'Sサイズ（~40cm）',
+                'form.medium_size': 'Mサイズ（~60cm）',
+                'form.large_size': 'Lサイズ（60cm+）',
+                'form.special_requests': '特別なご要望',
+                'form.requests_placeholder': '冷蔵が必要、壊れやすい物品など',
+                'form.price_estimate': '料金見積もり',
+                'form.price_note': '※実際の料金は荷物サイズと距離により決定されます',
+                'form.submit': '予約を確定する',
+                'login.title': 'ログイン',
+                'login.subtitle': 'アカウントにログインしてください',
+                'login.google': 'Googleでログイン',
+                'login.or': 'または',
+                'login.email': 'メールアドレス',
+                'login.password': 'パスワード',
+                'login.signin': 'サインイン',
+                'login.close': 'キャンセル',
+                'success.title': '予約完了！',
+                'success.message': '予約が正常に完了しました。詳細情報をメールでお送りします。',
+                'success.close': '閉じる'
+            },
+            en: {
+                'nav.home': 'Home',
+                'nav.service': 'Service',
+                'nav.reserve': 'Reserve',
+                'nav.login': 'Login',
+                'hero.title': 'Hands-free',
+                'hero.subtitle': 'Tourism Experience',
+                'hero.description': 'Drop off your luggage and explore tourist spots freely. Our mobile locker service picks up your bags anywhere.',
+                'hero.reserve': 'Book Now',
+                'hero.how': 'How it Works',
+                'steps.title': '3 Steps to Hands-free Tourism',
+                'steps.subtitle': 'Simple, Safe, and Convenient Luggage Storage',
+                'step1.title': 'Select Location',
+                'step1.description': 'Choose drop-off and pick-up locations in your preferred tourist area',
+                'step2.title': 'Set Time',
+                'step2.description': 'Specify when to drop off and pick up your luggage',
+                'step3.title': 'Enjoy Tourism',
+                'step3.description': 'Drop off your luggage and enjoy sightseeing hands-free',
+                'reserve.title': 'Luggage Storage Reservation',
+                'reserve.subtitle': 'Fill in the required information to complete your booking',
+                'form.user_info': 'User Information',
+                'form.name': 'Full Name *',
+                'form.email': 'Email Address *',
+                'form.phone': 'Phone Number',
+                'form.pickup_location': 'Drop-off Location',
+                'form.return_location': 'Pick-up Location',
+                'form.select_map': 'Click on the map to select location',
+                'form.select_location': 'Select Location',
+                'form.pickup_placeholder': 'Shinjuku Station East Exit',
+                'form.return_placeholder': 'Senso-ji Temple',
+                'form.datetime': 'Date & Time',
+                'form.pickup_time': 'Drop-off Time *',
+                'form.return_time': 'Pick-up Time *',
+                'form.immediate': 'Drop off now (Immediate service)',
+                'form.luggage_info': 'Luggage Information',
+                'form.small_size': 'Small (~40cm)',
+                'form.medium_size': 'Medium (~60cm)',
+                'form.large_size': 'Large (60cm+)',
+                'form.special_requests': 'Special Requests',
+                'form.requests_placeholder': 'Refrigeration required, fragile items, etc.',
+                'form.price_estimate': 'Price Estimate',
+                'form.price_note': '* Final price determined by luggage size and distance',
+                'form.submit': 'Confirm Reservation',
+                'login.title': 'Login',
+                'login.subtitle': 'Sign in to your account',
+                'login.google': 'Sign in with Google',
+                'login.or': 'or',
+                'login.email': 'Email Address',
+                'login.password': 'Password',
+                'login.signin': 'Sign In',
+                'login.close': 'Cancel',
+                'success.title': 'Booking Complete!',
+                'success.message': 'Your reservation has been successfully completed. We will send you detailed information via email.',
+                'success.close': 'Close'
+            }
+        };
+
+        // Global state
+        let currentLang = 'ja';
+        let isLoggedIn = false;
+        let currentUser = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            updatePriceEstimate();
+            setDefaultDateTime();
+        });
+
+        function initializeApp() {
+            // Check if user was previously logged in
+            const savedUser = localStorage.getItem('hikyaku_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                isLoggedIn = true;
+                updateLoginState();
+            }
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('mobileLoginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('reserveBtn').addEventListener('click', () => {
+                document.getElementById('reserve').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+
+            // Language toggle
+            document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+
+            // Login modal
+            document.getElementById('closeLoginModal').addEventListener('click', closeLoginModal);
+            document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
+            document.getElementById('emailLoginForm').addEventListener('submit', handleEmailLogin);
+
+            // Success modal
+            document.getElementById('closeSuccessModal').addEventListener('click', closeSuccessModal);
+
+            // Form events
+            document.getElementById('reservationForm').addEventListener('submit', handleReservation);
+            document.getElementById('immediatePickup').addEventListener('change', handleImmediatePickup);
+            
+            // Price calculation
+            ['smallBags', 'mediumBags', 'largeBags'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updatePriceEstimate);
+            });
+
+            // Location selection
+            document.getElementById('selectPickupBtn').addEventListener('click', () => selectLocation('pickup'));
+            document.getElementById('selectReturnBtn').addEventListener('click', () => selectLocation('return'));
+
+            // Close modals on outside click
+            document.getElementById('loginModal').addEventListener('click', (e) => {
+                if (e.target.id === 'loginModal') closeLoginModal();
+            });
+            document.getElementById('successModal').addEventListener('click', (e) => {
+                if (e.target.id === 'successModal') closeSuccessModal();
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ja' ? 'en' : 'ja';
+            document.getElementById('currentLang').textContent = currentLang.toUpperCase();
+            translatePage();
+        }
+
+        function translatePage() {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[currentLang][key]) {
+                    element.textContent = translations[currentLang][key];
+                }
+            });
+
+            // Translate placeholders
+            const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+            placeholderElements.forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (translations[currentLang][key]) {
+                    element.placeholder = translations[currentLang][key];
+                }
+            });
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        function handleGoogleLogin() {
+            // Mock Google login
+            const mockUser = {
+                name: 'John Doe',
+                email: 'john.doe@gmail.com',
+                loginMethod: 'google'
+            };
+            
+            loginUser(mockUser);
+        }
+
+        function handleEmailLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Mock email login
+            const mockUser = {
+                name: 'User',
+                email: email,
+                loginMethod: 'email'
+            };
+            
+            loginUser(mockUser);
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            isLoggedIn = true;
+            localStorage.setItem('hikyaku_user', JSON.stringify(user));
+            updateLoginState();
+            closeLoginModal();
+        }
+
+        function updateLoginState() {
+            const loginBtns = document.querySelectorAll('#loginBtn, #mobileLoginBtn');
+            loginBtns.forEach(btn => {
+                if (isLoggedIn) {
+                    btn.innerHTML = `<i class="fas fa-user-circle mr-2"></i>${currentUser.name}`;
+                } else {
+                    btn.innerHTML = `<i class="fas fa-user mr-2"></i>ログイン`;
+                }
+            });
+
+            // Hide guest info form if logged in
+            const guestInfo = document.getElementById('guestInfo');
+            if (isLoggedIn) {
+                guestInfo.style.display = 'none';
+            } else {
+                guestInfo.style.display = 'block';
+            }
+        }
+
+        function selectLocation(type) {
+            // Mock location selection
+            const locations = [
+                '新宿駅東口', '渋谷駅ハチ公口', '浅草寺', '東京スカイツリー',
+                '銀座', '原宿', '秋葉原', '上野駅', '品川駅', '羽田空港'
+            ];
+            
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            
+            if (type === 'pickup') {
+                document.getElementById('pickupLocation').value = randomLocation;
+            } else {
+                document.getElementById('returnLocation').value = randomLocation;
+            }
+        }
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            const pickup = new Date(now.getTime() + 30 * 60000); // 30 minutes from now
+            const returnTime = new Date(now.getTime() + 8 * 3600000); // 8 hours from now
+
+            document.getElementById('pickupTime').value = pickup.toISOString().slice(0, 16);
+            document.getElementById('returnTime').value = returnTime.toISOString().slice(0, 16);
+        }
+
+        function handleImmediatePickup() {
+            const immediate = document.getElementById('immediatePickup').checked;
+            const pickupTime = document.getElementById('pickupTime');
+            
+            if (immediate) {
+                const now = new Date();
+                pickupTime.value = now.toISOString().slice(0, 16);
+                pickupTime.disabled = true;
+            } else {
+                pickupTime.disabled = false;
+                setDefaultDateTime();
+            }
+        }
+
+        function updatePriceEstimate() {
+            const small = parseInt(document.getElementById('smallBags').value) || 0;
+            const medium = parseInt(document.getElementById('mediumBags').value) || 0;
+            const large = parseInt(document.getElementById('largeBags').value) || 0;
+
+            // Price calculation (mock)
+            const prices = {
+                small: 800,
+                medium: 1200,
+                large: 1800
+            };
+
+            const total = (small * prices.small) + (medium * prices.medium) + (large * prices.large);
+            document.getElementById('priceEstimate').textContent = total.toLocaleString();
+        }
+
+        function handleReservation(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = {
+                user: isLoggedIn ? currentUser : {
+                    name: document.getElementById('userName').value,
+                    email: document.getElementById('userEmail').value,
+                    phone: document.getElementById('userPhone').value
+                },
+                pickup: {
+                    location: document.getElementById('pickupLocation').value,
+                    time: document.getElementById('pickupTime').value
+                },
+                return: {
+                    location: document.getElementById('returnLocation').value,
+                    time: document.getElementById('returnTime').value
+                },
+                luggage: {
+                    small: document.getElementById('smallBags').value,
+                    medium: document.getElementById('mediumBags').value,
+                    large: document.getElementById('largeBags').value
+                },
+                specialRequests: document.getElementById('specialRequests').value,
+                immediate: document.getElementById('immediatePickup').checked,
+                price: document.getElementById('priceEstimate').textContent,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save to localStorage (mock database)
+            const reservations = JSON.parse(localStorage.getItem('hikyaku_reservations') || '[]');
+            reservations.push(formData);
+            localStorage.setItem('hikyaku_reservations', JSON.stringify(reservations));
+
+            console.log('Reservation saved:', formData);
+            
+            // Show success modal
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
